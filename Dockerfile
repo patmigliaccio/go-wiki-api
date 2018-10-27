@@ -1,14 +1,12 @@
-FROM golang:1.3
+FROM golang:1.7
 
 ENV PORT 80
 
 ADD . /go/src/github.com/patmigliaccio/untitled
 WORKDIR /go/src/github.com/patmigliaccio/untitled
 
-RUN go get github.com/go-martini/martini
-RUN go get github.com/martini-contrib/render
-RUN go get gopkg.in/mgo.v2
-RUN go get github.com/martini-contrib/binding
+RUN go get github.com/gorilla/mux
+RUN go get github.com/patrickmn/go-wikimedia
 
 EXPOSE 80
-CMD go run server.go
+CMD go run *.go
