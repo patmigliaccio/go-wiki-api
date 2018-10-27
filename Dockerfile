@@ -2,11 +2,11 @@ FROM golang:1.7
 
 ENV PORT 80
 
-ADD . /go/src/github.com/patmigliaccio/untitled
-WORKDIR /go/src/github.com/patmigliaccio/untitled
+ADD . /go/src/github.com/patmigliaccio/go-wiki-api
+WORKDIR /go/src/github.com/patmigliaccio/go-wiki-api
 
 RUN go get github.com/gorilla/mux
-RUN go get github.com/patmigliaccio/go-wikimedia
+RUN go get github.com/patmigliaccio/go-go-wikimedia
 
 EXPOSE 80
 CMD go run *.go
