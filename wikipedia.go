@@ -6,13 +6,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/patrickmn/go-wikimedia"
+	"github.com/patmigliaccio/go-wikimedia"
 )
 
 // A WikipediaAPIClient makes calls to Wikipedia for content.
 type WikipediaAPIClient interface {
 	GetExtracts(titles []string) ([]WikipediaPageFull, error)
 	GetPrefixResults(pfx string, limit int) ([]WikipediaPage, error)
+	GetCategories(pageid int) (WikipediaPageFull, error)
 }
 
 // A WikipediaPage returned from the API
@@ -24,8 +25,9 @@ type WikipediaPage struct {
 
 // A WikipediaPageFull with extract returned from the API
 type WikipediaPageFull struct {
-	Meta    WikipediaPage `json:"metadata"`
-	Extract string        `json:"extract"`
+	Meta       WikipediaPage `json:"metadata"`
+	Extract    string        `json:"extract"`
+	Categories []string      `json:"categories"`
 }
 
 type wkAPI struct {
@@ -70,7 +72,7 @@ func (wk *wkAPI) GetPrefixResults(pfx string, limit int) ([]WikipediaPage, error
 		values = append(values, WikipediaPage{
 			ID:    p.PageId,
 			Title: p.Title,
-			URL:   getWikipediaURL(p),
+			URL:   getWikipediaURL(p.Title),
 		})
 	}
 
@@ -95,7 +97,7 @@ func (wk *wkAPI) GetExtracts(titles []string) ([]WikipediaPageFull, error) {
 			Meta: WikipediaPage{
 				ID:    p.PageId,
 				Title: p.Title,
-				URL:   getWikipediaURL(p),
+				URL:   getWikipediaURL(p.Title),
 			},
 			Extract: p.Extract,
 		})
@@ -104,7 +106,43 @@ func (wk *wkAPI) GetExtracts(titles []string) ([]WikipediaPageFull, error) {
 	return values, nil
 }
 
+func (wk *wkAPI) GetCategories(pageid int) (WikipediaPageFull, error) {
+	var value WikipediaPageFull
+
+	f := url.Values{
+		"action": {"parse"},
+		"pageid": {strconv.Itoa(pageid)},
+		"prop":   {"categories"},
+	}
+
+	res, err := wk.w.Query(f)
+	if err != nil {
+		return value, err
+	}
+
+	value = WikipediaPageFull{
+		Meta: WikipediaPage{
+			ID:    res.Parse.PageId,
+			Title: res.Parse.Title,
+			URL:   getWikipediaURL(res.Parse.Title),
+		},
+		Categories: getCategoryNames(res.Parse.Categories),
+	}
+
+	return value, nil
+}
+
 // getWikipediaURL returns a Wikipedia URL from a `wikimedia.ApiPage`
-func getWikipediaURL(p wikimedia.ApiPage) string {
-	return fmt.Sprintf("https://en.wikipedia.org/wiki/%s", strings.Replace(p.Title, " ", "_", -1))
+func getWikipediaURL(pageTitle string) string {
+	return fmt.Sprintf("https://en.wikipedia.org/wiki/%s", strings.Replace(pageTitle, " ", "_", -1))
+}
+
+// getCategoryNames returns the string name from a `wikimedia.ApiPageCategory`
+func getCategoryNames(categories []wikimedia.ApiPageCategory) []string {
+	var values []string
+	for _, cat := range categories {
+		values = append(values, cat.Name)
+	}
+
+	return values
 }

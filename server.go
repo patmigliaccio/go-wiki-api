@@ -11,6 +11,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Response is the default object returned from the API
+type Response struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
@@ -23,6 +29,7 @@ func main() {
 	apiv1 := router.PathPrefix("/api/v1.0").Subrouter()
 	apiv1.HandleFunc("/extracts/{titles}", getExtracts).Methods("GET")
 	apiv1.HandleFunc("/search/{value}", getSearch).Methods("GET")
+	apiv1.HandleFunc("/categories/{pageid}", getCategories).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
@@ -33,7 +40,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 Please use one of the following endpoints: 
 GET /api/v1.0/extracts/{titles}
-GET /api/v1.0/search/{value}`)
+GET /api/v1.0/search/{value}
+GET /api/v1.0/categories/{pageid}`)
 }
 
 func getExtracts(w http.ResponseWriter, r *http.Request) {
@@ -71,4 +79,36 @@ func getSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(values)
+}
+
+func getCategories(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	wiki, err := NewWikipediaClient()
+	if err != nil {
+		fmt.Fprintln(w, "Error instantiating Wikipedia Client.")
+	}
+
+	id, err := strconv.ParseInt(vars["pageid"], 10, 64)
+	if err != nil {
+		id = 0
+	}
+
+	value, err := wiki.GetCategories(int(id))
+	if err != nil {
+		fmt.Fprintln(w, "Error retrieving categories.")
+	}
+
+	if err != nil {
+		w.WriteHeader(404)
+
+		json.NewEncoder(w).Encode(Response{
+			Status:  404,
+			Message: "Error retrieving categories.",
+		})
+
+		return
+	}
+
+	json.NewEncoder(w).Encode(value)
 }

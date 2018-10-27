@@ -6,7 +6,7 @@ ADD . /go/src/github.com/patmigliaccio/untitled
 WORKDIR /go/src/github.com/patmigliaccio/untitled
 
 RUN go get github.com/gorilla/mux
-RUN go get github.com/patrickmn/go-wikimedia
+RUN go get github.com/patmigliaccio/go-wikimedia
 
 EXPOSE 80
 CMD go run *.go
