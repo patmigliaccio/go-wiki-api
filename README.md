@@ -85,8 +85,10 @@ $ http http://localhost:3000/api/v1.0/extracts/Jimmy%20Wales
 
 Retrieves a list of pages based on a search value. Specifically tailored for typing in the prefix of a word for autocomplete functionality.
 
+* `limit=50` - Limits the amount of search results returned from the API (*optional*) 
+
 ```bash
-$ http http://localhost:3000/api/v1.0/search/Jimmy
+$ http http://localhost:3000/api/v1.0/search/Jimmy?limit=10
 ```
 
 ##### Response

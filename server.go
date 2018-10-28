@@ -32,7 +32,7 @@ func main() {
 
 	apiv1 := router.PathPrefix("/api/v1.0").Subrouter()
 	apiv1.HandleFunc("/extracts/{titles}", getExtracts).Methods("GET")
-	apiv1.HandleFunc("/search/{value}", getSearch).Methods("GET")
+	apiv1.HandleFunc("/search/{value}", getSearch).Queries("limit", "{limit}").Methods("GET")
 	apiv1.HandleFunc("/categories/{pageid}", getCategories).Methods("GET")
 	apiv1.HandleFunc("/sections/{pageid}", getSections).Methods("GET")
 
@@ -45,7 +45,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 Please use one of the following endpoints: 
 GET /api/v1.0/extracts/{titles}
-GET /api/v1.0/search/{value}
+GET /api/v1.0/search/{value}?limit={limit}
 GET /api/v1.0/categories/{pageid}
 GET /api/v1.0/sections/{pageid}`)
 }
