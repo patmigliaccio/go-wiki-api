@@ -6,6 +6,7 @@ ADD . /go/src/github.com/patmigliaccio/go-wiki-api
 WORKDIR /go/src/github.com/patmigliaccio/go-wiki-api
 
 RUN go get github.com/gorilla/mux
+RUN go get github.com/gorilla/handlers
 RUN go get github.com/patmigliaccio/go-wikimedia
 
 EXPOSE 80

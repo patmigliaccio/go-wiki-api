@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -26,13 +27,16 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", index)
 
+	// Allows cross-origin requests from any domain
+	o := handlers.AllowedOrigins([]string{"*"})
+
 	apiv1 := router.PathPrefix("/api/v1.0").Subrouter()
 	apiv1.HandleFunc("/extracts/{titles}", getExtracts).Methods("GET")
 	apiv1.HandleFunc("/search/{value}", getSearch).Methods("GET")
 	apiv1.HandleFunc("/categories/{pageid}", getCategories).Methods("GET")
 	apiv1.HandleFunc("/sections/{pageid}", getSections).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(o)(router)))
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
