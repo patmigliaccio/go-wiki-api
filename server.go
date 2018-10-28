@@ -31,6 +31,7 @@ func main() {
 	apiv1 := router.PathPrefix("/api/v1.0").Subrouter()
 	apiv1.HandleFunc("/extracts/{titles}", GetExtracts).Methods("GET")
 	apiv1.HandleFunc("/search/{value}", GetSearch).Queries("limit", "{limit}").Methods("GET")
+	apiv1.HandleFunc("/search/{value}", GetSearch).Methods("GET")
 	apiv1.HandleFunc("/categories/{pageid}", GetCategories).Methods("GET")
 	apiv1.HandleFunc("/sections/{pageid}", GetSections).Methods("GET")
 
