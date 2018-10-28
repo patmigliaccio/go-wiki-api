@@ -112,7 +112,7 @@ $ http http://localhost:3000/api/v1.0/search/Jimmy
 Retrieves the categories associated with an article based on a specified Wikipedia `pageid`.
 
 ```bash
-$ http http://localhost:3000/api/v1.0/categories/Jimmy
+$ http http://localhost:3000/api/v1.0/categories/3703446
 ```
 
 ##### Response
@@ -134,6 +134,38 @@ $ http http://localhost:3000/api/v1.0/categories/Jimmy
     "American_technology_company_founders",
     "Auburn_University_alumni",
     "Recipients_of_the_Gottlieb_Duttweiler_Prize"
+  ]
+}
+```
+
+#### GET Sections
+
+Retrieves the sections within an article based on a specified Wikipedia `pageid`.
+
+```bash
+$ http http://localhost:3000/api/v1.0/sections/3703446
+```
+
+##### Response
+
+```json
+{
+  "metadata": {
+    "id": 3703446,
+    "title": "Jimmy Wales",
+    "url": "https://en.wikipedia.org/wiki/Jimmy_Wales"
+  },
+  "extract": "",
+  "categories": null,
+  "sections": [
+    "Early_life",
+    "Career",
+    "Chicago_Options_Associates_and_Bomis",
+    "Nupedia_and_the_origins_of_Wikipedia",
+    "Wikipedia",
+    "Controversy_regarding_Wales's_status_as_co-founder",
+    "Role",
+    ...
   ]
 }
 ```

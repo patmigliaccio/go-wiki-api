@@ -30,6 +30,7 @@ func main() {
 	apiv1.HandleFunc("/extracts/{titles}", getExtracts).Methods("GET")
 	apiv1.HandleFunc("/search/{value}", getSearch).Methods("GET")
 	apiv1.HandleFunc("/categories/{pageid}", getCategories).Methods("GET")
+	apiv1.HandleFunc("/sections/{pageid}", getSections).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
@@ -41,7 +42,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 Please use one of the following endpoints: 
 GET /api/v1.0/extracts/{titles}
 GET /api/v1.0/search/{value}
-GET /api/v1.0/categories/{pageid}`)
+GET /api/v1.0/categories/{pageid}
+GET /api/v1.0/sections/{pageid}`)
 }
 
 func getExtracts(w http.ResponseWriter, r *http.Request) {
@@ -96,15 +98,39 @@ func getCategories(w http.ResponseWriter, r *http.Request) {
 
 	value, err := wiki.GetCategories(int(id))
 	if err != nil {
-		fmt.Fprintln(w, "Error retrieving categories.")
-	}
-
-	if err != nil {
 		w.WriteHeader(404)
 
 		json.NewEncoder(w).Encode(Response{
 			Status:  404,
 			Message: "Error retrieving categories.",
+		})
+
+		return
+	}
+
+	json.NewEncoder(w).Encode(value)
+}
+
+func getSections(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	wiki, err := NewWikipediaClient()
+	if err != nil {
+		fmt.Fprintln(w, "Error instantiating Wikipedia Client.")
+	}
+
+	id, err := strconv.ParseInt(vars["pageid"], 10, 64)
+	if err != nil {
+		id = 0
+	}
+
+	value, err := wiki.GetSections(int(id))
+	if err != nil {
+		w.WriteHeader(404)
+
+		json.NewEncoder(w).Encode(Response{
+			Status:  404,
+			Message: "Error retrieving sections.",
 		})
 
 		return

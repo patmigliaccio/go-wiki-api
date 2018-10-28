@@ -14,6 +14,7 @@ type WikipediaAPIClient interface {
 	GetExtracts(titles []string) ([]WikipediaPageFull, error)
 	GetPrefixResults(pfx string, limit int) ([]WikipediaPage, error)
 	GetCategories(pageid int) (WikipediaPageFull, error)
+	GetSections(pageid int) (WikipediaPageFull, error)
 }
 
 // A WikipediaPage returned from the API
@@ -28,6 +29,7 @@ type WikipediaPageFull struct {
 	Meta       WikipediaPage `json:"metadata"`
 	Extract    string        `json:"extract"`
 	Categories []string      `json:"categories"`
+	Sections   []string      `json:"sections"`
 }
 
 type wkAPI struct {
@@ -106,6 +108,7 @@ func (wk *wkAPI) GetExtracts(titles []string) ([]WikipediaPageFull, error) {
 	return values, nil
 }
 
+// GetCategories retrieves the categories associated with a specified Wikipedia article.
 func (wk *wkAPI) GetCategories(pageid int) (WikipediaPageFull, error) {
 	var value WikipediaPageFull
 
@@ -132,6 +135,33 @@ func (wk *wkAPI) GetCategories(pageid int) (WikipediaPageFull, error) {
 	return value, nil
 }
 
+// GetSections retrieves the sections within a specified Wikipedia article.
+func (wk *wkAPI) GetSections(pageid int) (WikipediaPageFull, error) {
+	var value WikipediaPageFull
+
+	f := url.Values{
+		"action": {"parse"},
+		"pageid": {strconv.Itoa(pageid)},
+		"prop":   {"sections"},
+	}
+
+	res, err := wk.w.Query(f)
+	if err != nil {
+		return value, err
+	}
+
+	value = WikipediaPageFull{
+		Meta: WikipediaPage{
+			ID:    res.Parse.PageId,
+			Title: res.Parse.Title,
+			URL:   getWikipediaURL(res.Parse.Title),
+		},
+		Sections: getSectionAnchors(res.Parse.Sections),
+	}
+
+	return value, nil
+}
+
 // getWikipediaURL returns a Wikipedia URL from a `wikimedia.ApiPage`
 func getWikipediaURL(pageTitle string) string {
 	return fmt.Sprintf("https://en.wikipedia.org/wiki/%s", strings.Replace(pageTitle, " ", "_", -1))
@@ -142,6 +172,16 @@ func getCategoryNames(categories []wikimedia.ApiPageCategory) []string {
 	var values []string
 	for _, cat := range categories {
 		values = append(values, cat.Name)
+	}
+
+	return values
+}
+
+// getSectionAnchors returns the anchor name from a `wikimedia.ApiPageSection`
+func getSectionAnchors(sections []wikimedia.ApiPageSection) []string {
+	var values []string
+	for _, section := range sections {
+		values = append(values, section.Anchor)
 	}
 
 	return values
