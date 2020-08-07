@@ -7,13 +7,14 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/patmigliaccio/go-wiki-api/wikiclient"
 )
 
 // GetExtracts returns the content for a list of titles
 func GetExtracts(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	wiki, err := NewWikipediaClient()
+	wiki, err := wikiclient.NewWikipediaClient()
 	if err != nil {
 		fmt.Fprintln(w, "Error instantiating Wikipedia Client.")
 	}
@@ -30,7 +31,7 @@ func GetExtracts(w http.ResponseWriter, r *http.Request) {
 func GetSearch(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	wiki, err := NewWikipediaClient()
+	wiki, err := wikiclient.NewWikipediaClient()
 	if err != nil {
 		fmt.Fprintln(w, "Error instantiating Wikipedia Client.")
 	}
@@ -52,7 +53,7 @@ func GetSearch(w http.ResponseWriter, r *http.Request) {
 func GetCategories(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	wiki, err := NewWikipediaClient()
+	wiki, err := wikiclient.NewWikipediaClient()
 	if err != nil {
 		fmt.Fprintln(w, "Error instantiating Wikipedia Client.")
 	}
@@ -81,7 +82,7 @@ func GetCategories(w http.ResponseWriter, r *http.Request) {
 func GetSections(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	wiki, err := NewWikipediaClient()
+	wiki, err := wikiclient.NewWikipediaClient()
 	if err != nil {
 		fmt.Fprintln(w, "Error instantiating Wikipedia Client.")
 	}
